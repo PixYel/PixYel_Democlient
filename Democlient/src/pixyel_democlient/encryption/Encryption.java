@@ -17,7 +17,8 @@ import java.util.Base64;
  */
 public class Encryption {
 
-    static int keyLength = 2048;
+    static final int KEYLENGTH = 2048;
+    static final int BLOCKSIZE = (KEYLENGTH / 8) - 16;
 
     /**
      * Generates the Key-Pair which contains the public and the private key<p>
@@ -56,7 +57,7 @@ public class Encryption {
             // Get an instance of the RSA key generator
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             //Initialize it with 2048 Bit Encryption (keysize)
-            kpg.initialize(keyLength);
+            kpg.initialize(KEYLENGTH);
             // Generate the keys — might take sometime on slow computers
             KeyPair kp = kpg.generateKeyPair();
             //Gets the encoded public and private Keys as String
@@ -118,8 +119,8 @@ public class Encryption {
 
             byte[] textAsBytes = toEncrypt.getBytes("UTF8");
             //I dont know why but this is the max amount of encryption data
-            int encryptedKeyLength = (keyLength / 8);
-            int maxBytesToEncrypt = encryptedKeyLength - 11;
+            int encryptedKeyLength = (KEYLENGTH / 8);
+            int maxBytesToEncrypt = BLOCKSIZE;
             int amountOfSplitting = textAsBytes.length / maxBytesToEncrypt;
             if (textAsBytes.length % maxBytesToEncrypt != 0) {
                 amountOfSplitting += 1;
@@ -205,8 +206,8 @@ public class Encryption {
             byte[] encrypted = Base64.getDecoder().decode(toDecrypt);
 
             //I dont know why but this is the max amount of encryption data
-            int encryptedKeyLength = (keyLength / 8);
-            int maxBytesToEncrypt = encryptedKeyLength - 11;
+            int encryptedKeyLength = (KEYLENGTH / 8);
+            int maxBytesToEncrypt = BLOCKSIZE;//TODO -11
             int amountOfSplitting = encrypted.length / encryptedKeyLength;
             int textLength = (amountOfSplitting - 1) * maxBytesToEncrypt;//Not the final value!
             boolean once = true;

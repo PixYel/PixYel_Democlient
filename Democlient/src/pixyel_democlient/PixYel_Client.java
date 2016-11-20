@@ -106,9 +106,9 @@ public class PixYel_Client {
             clientPrivateKey = keyPair[1];
             //Erzeuge ein XML mit einem Tag namens publickey und einem tag namens storeid, siehe Spezifikation!
             XML loginXML = XML.createNewXML("request").addChild("login");
-            loginXML.getFirstChild().addChildren("storeid", "publickey");
-            loginXML.getFirstChild().getFirstChild("storeid").setContent(storeID);
-            loginXML.getFirstChild().getFirstChild("publickey").setContent(keyPair[0]);
+            loginXML.getFirstChild().addChildren("storeId", "publicKey");
+            loginXML.getFirstChild().getFirstChild("storeId").setContent(storeID);
+            loginXML.getFirstChild().getFirstChild("publicKey").setContent(keyPair[0]);
             //Übermittle dem Server meinen Public Key
             sendToServer(loginXML.toString());
         } catch (Encryption.EncryptionException ex) {
