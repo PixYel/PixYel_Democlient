@@ -48,8 +48,8 @@ public class PixYel_Client {
         //**Beispiel: sendet ein xml mit dem node "echo" an den Server, der server schickt daraufhin selbiges zurück
         sendToServer(XML.createNewXML("request").addChild("echo").toString());
         //**Wenn man die App schließt oder ähnliches, einfach die disconnect Methode aufrufen
-        Thread.sleep(1000);
-        disconnect();
+        //Thread.sleep(1000);
+        //disconnect();
     }
 
     public void ping() {
@@ -170,7 +170,7 @@ public class PixYel_Client {
                 try {
                     rein = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
                     string = rein.readLine();
-                    if (run) {
+                    if (run && string != null && !string.isEmpty()) {
                         onStringReceived(string);
                     }
                 } catch (IOException exe) {
