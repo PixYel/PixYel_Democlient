@@ -15,7 +15,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import pixyel_democlient.compression.Compression;
 import pixyel_democlient.encryption.Encryption;
 import pixyel_democlient.xml.XML;
 
@@ -48,8 +47,8 @@ public class PixYel_Client {
         //**Beispiel: sendet ein xml mit dem node "echo" an den Server, der server schickt daraufhin selbiges zurück
         sendToServer(XML.createNewXML("request").addChild("echo").toString());
         //**Wenn man die App schließt oder ähnliches, einfach die disconnect Methode aufrufen
-        //Thread.sleep(1000);
-        //disconnect();
+        Thread.sleep(1000);
+        disconnect();
     }
 
     public void ping() {
@@ -138,8 +137,8 @@ public class PixYel_Client {
 
     public void sendToServer(String toSend) {
         try {
-            String compressed = Compression.compress(toSend);
-            String encrypted = Encryption.encrypt(compressed, serverPublicKey);
+            //String compressed = Compression.compress(toSend);
+            String encrypted = Encryption.encrypt(toSend, serverPublicKey);
             PrintWriter raus = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
             raus.println(encrypted);
             raus.flush();
@@ -210,12 +209,12 @@ public class PixYel_Client {
             //Decrypte den String
             String decrypted = Encryption.decrypt(string, clientPrivateKey);
             //Decomprimiere den String
-            String decompressed = Compression.decompress(decrypted);
+            //String decompressed = Compression.decompress(decrypted);
             //Parse den String in ein XML
-            XML receivedXML = XML.openXML(decompressed);
+            XML receivedXML = XML.openXML(decrypted);
             //Beispielvorgehen: Zeige den XML Baum in der Ausgabe an
             System.out.println("Command received: \n" + receivedXML.toStringGraph());
-        } catch (Encryption.EncryptionException | Compression.CompressionException | XML.XMLException e) {
+        } catch (Encryption.EncryptionException | XML.XMLException e) {
             
         }
     }
