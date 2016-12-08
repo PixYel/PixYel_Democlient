@@ -1,4 +1,4 @@
-package pixyel_democlient.encryption;
+package pixyel_democlient_rest.encryption;
 
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;

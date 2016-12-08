@@ -1,4 +1,4 @@
-package pixyel_democlient.xml;
+package pixyel_democlient_socket.xml;
 
 import java.io.File;
 import java.io.IOException;

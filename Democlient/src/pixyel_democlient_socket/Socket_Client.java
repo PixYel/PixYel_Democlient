@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pixyel_democlient;
+package pixyel_democlient_socket;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,18 +15,18 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import pixyel_democlient.encryption.Encryption;
-import pixyel_democlient.xml.XML;
+import pixyel_democlient_socket.encryption.Encryption;
+import pixyel_democlient_socket.xml.XML;
 
 /**
  *
  * @author Josua Frank
  */
-public class PixYel_Client {
+public class Socket_Client {
 
     Socket socket;//Der "Kanal" zum Server
     ServerInputListener listener;//Ein eigener Thread, der auf eingehende Nachrichten vom Server horcht
-    String serverIP = "sharknoon.de";//IP-Adresse des Servers, zum testes localhost (Server und Client auf dem selben Computer), wird später "sharknoon.de" sein!
+    String serverIP = "localhost";//IP-Adresse des Servers, zum testes localhost (Server und Client auf dem selben Computer), wird später "sharknoon.de" sein!
     //Der öffentliche Key des Servers
     String serverPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmG8OfhJrkN9/rXLh7auyUPcq7UxmYModYswChY8hIMgZO4m+cxOWopxOptUAYedjA4ZAKGp/P1g6n6YaXvtPQqIbi7G5oCT4vbh0zYFgI3wNCJlKtUX1gb6uCQW3rPinANcPtlZoIyegAsn/OW0FMZtc1x8PN0H1MQTlcCctXdJdotuljeYriO1lkRfb3GsotLIYjciMqIMKGQRQ2Rhj81bnxP9FybdNuVIjlS6Rfx9fzaZ2BKIdm7O7/Dzn9TcSZEOZdOSS7CHMMKr14O26g+bR2HiGWx8AbOH2zP3DMpR9/Y8GUrjO6QPqA+GorICGYWxIlrcm4iYx8740FsDaQQIDAQAB";
     //Der private Key des Clients
@@ -36,12 +36,10 @@ public class PixYel_Client {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws InterruptedException {
-        PixYel_Client demoClient = new PixYel_Client();
+        Socket_Client demoClient = new Socket_Client();
     }
 
-    public PixYel_Client() throws InterruptedException {
-        //Ping dient nur zum Überprüfen der Socketverbindung, NICHT zum Überprüfen der Verschlüsselung und Compression
-        //ping();
+    public Socket_Client() throws InterruptedException {
         //**Verbindung zum Server herstellen ENTWEDER Ping ODER connect aufrufen!!!!!!!!!!!11!!!!!elf!!
         connect("HanswurstID");
         //**Beispiel: sendet ein xml mit dem node "echo" an den Server, der server schickt daraufhin selbiges zurück
@@ -49,29 +47,6 @@ public class PixYel_Client {
         //**Wenn man die App schließt oder ähnliches, einfach die disconnect Methode aufrufen
         Thread.sleep(1000);
         disconnect();
-    }
-
-    public void ping() {
-        //Falls der Server unerreichbar ist, versucht er es 'attemps' mal
-        int attempts = 10;
-        while (attempts > 0 && (socket == null || !socket.isConnected())) {
-            attempts--;
-            try {
-                socket = new Socket();
-                socket.connect(new InetSocketAddress(serverIP, 7331), 500);
-                System.out.println("Erfolgreich verbunden");
-                listener = new ServerInputListener();
-                new Thread(listener).start();
-                System.out.println("Sende Echo...");
-                PrintWriter raus = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
-                raus.println("echo");
-                raus.flush();
-            } catch (UnknownHostException e) {
-                System.err.println("Unbekannter Host: " + e.getMessage());
-            } catch (IOException e) {
-                System.err.println("Server konnte nicht erreicht werden: " + e.getMessage());
-            }
-        }
     }
 
     public void connect(String storeID) {
@@ -111,7 +86,7 @@ public class PixYel_Client {
             //Übermittle dem Server meinen Public Key
             sendToServer(loginXML.toString());
         } catch (Encryption.EncryptionException ex) {
-            Logger.getLogger(PixYel_Client.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Socket_Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
