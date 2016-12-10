@@ -40,28 +40,40 @@ public class Rest_Client {
     public Rest_Client() throws InterruptedException {
         login("blob");
         //**Beispiel: sendet ein xml mit dem node "echo" an den Server, der server schickt daraufhin selbiges zurück
-        sendToServer(XML.createNewXML("request").addAttribute("storeId", storeId).addChild("echo").toString());
+        sendToServer(XML.createNewXML("request").addAttribute("storeId", storeId).addChild("echo"));
         //**Wenn man die App schließt oder ähnliches, einfach die disconnect Methode aufrufen
-        sendToServer(XML.createNewXML("request").addAttribute("storeId", storeId).addChild("getItem").addChild("id").setContent("1").toString());
+        sendToServer(XML.createNewXML("request").addAttribute("storeId", storeId).addChild("getItem").addChild("id").setContent("1"));
         Thread.sleep(1000);
         disconnect();
     }
 
-    private void sendToServer(String toSend) {
+    private void sendToServer(XML toSend) {
+        sendToServer(toSend, true);
+    }
+
+    private void sendToServer(XML toSend, boolean encrypted) {
         try {
-            String encrypted = Encryption.encrypt(toSend, serverPublicKey);
+            String encryptedString = "";
+            if (encrypted) {
+                encryptedString = Encryption.encrypt(toSend.toString(), serverPublicKey);
+            }
 
             CloseableHttpClient httpclient = HttpClients.createDefault();
             HttpPost httppost = new HttpPost("http://" + serverIP + ":7332/api/request/");
 
             // Request parameters and other properties.
-            httppost.setEntity(new StringEntity(encrypted));
+            httppost.setEntity(new StringEntity(encryptedString));
             //Execute and get the response.
             HttpResponse response = httpclient.execute(httppost);
             String received = EntityUtils.toString(response.getEntity());
 
             if (received != null && !received.isEmpty()) {
-                String decrypted = Encryption.decrypt(received, clientPrivateKey);
+                String decrypted;
+                if (received.startsWith("<request")) {
+                    decrypted = received;
+                } else {
+                    decrypted = Encryption.decrypt(received, clientPrivateKey);
+                }
                 System.out.println(XML.openXML(decrypted).toStringGraph());
             }
 
@@ -71,7 +83,7 @@ public class Rest_Client {
     }
 
     private void disconnect() {
-        sendToServer(XML.createNewXML("request").addAttribute("storeId", storeId).addChild("disconnect").toString());
+        sendToServer(XML.createNewXML("request").addAttribute("storeId", storeId).addChild("disconnect"));
         System.out.println("Habe mich beim Server abgemeldet und beende mich jetzt...");
         System.exit(0);
     }
@@ -92,7 +104,7 @@ public class Rest_Client {
             loginXML.getFirstChild("storeId").setContent(storeId);
             loginXML.getFirstChild("publicKey").setContent(keyPair[0]);
             //Übermittle dem Server meinen Public Key
-            sendToServer(loginXML.toString());
+            sendToServer(loginXML);
         } catch (Encryption.EncryptionException ex) {
             Logger.getLogger(Rest_Client.class.getName()).log(Level.SEVERE, null, ex);
         }
