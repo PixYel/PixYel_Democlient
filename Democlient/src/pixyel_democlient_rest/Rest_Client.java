@@ -69,7 +69,8 @@ public class Rest_Client {
 
             if (received != null && !received.isEmpty()) {
                 String decrypted;
-                if (received.startsWith("<request")) {
+                //System.out.println(received);
+                if (received.startsWith("<reply")) {
                     decrypted = received;
                 } else {
                     decrypted = Encryption.decrypt(received, clientPrivateKey);
